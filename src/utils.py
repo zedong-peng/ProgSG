@@ -33,8 +33,8 @@ from pathlib import Path
 def check_nx_version():
     # nxvg = '2.2'
     nxva = nx.__version__
-    if not nxva.startswith('2'):
-        # if nxvg != nxva:
+    major_version = int(nxva.split('.')[0])
+    if major_version < 2:
         raise RuntimeError(
             f'Wrong networkx version! Need >=2 instead of {nxva}')
 

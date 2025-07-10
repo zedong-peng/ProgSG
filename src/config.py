@@ -39,14 +39,15 @@ parser.add_argument('--task', default=TASK)
 
 # SUBTASK = 'dse'
 # SUBTASK = 'train'
-SUBTASK = 'inference'
+SUBTASK = 'train'
 parser.add_argument('--subtask', default=SUBTASK)
+
 #########################################################################################################
 
 ##################### Flags for loading models #####################################################
 
 load_model = 'None'
-load_model = 'train_2024-03-26T19-12-18.035699_regression_scai5'
+# load_model = 'train_2024-03-26T19-12-18.035699_regression_scai5'
 #load_model = ''#path to your downloaded trained model.
 
 
@@ -385,6 +386,7 @@ elif tag == 'wmp-d':  # 05/29/2023: NeurIPS 2023 dataset track
                    'symm-opt', 'syrk', 'syr2k', 'trmm', 'trmm-opt', 'mvt-medium', 'correlation',
                    'atax-medium', 'bicg-medium', 'gesummv-medium', 'symm-opt-medium',
                    'gemver-medium']
+
 else:
     raise NotImplementedError()
 
@@ -472,7 +474,7 @@ if load_pretrained_GNN:
 guide_loss_w = 0.003
 parser.add_argument('--guide_loss_w', type=float, default=guide_loss_w)
 
-load_guidance_emb = True
+load_guidance_emb = False
 parser.add_argument('--load_guidance_emb', type=bool, default=load_guidance_emb)
 guidance_emb_path = "pretrain_gnn/zongyue_code/pretrained_guide_emb.pth"
 parser.add_argument('--guidance_emb_path', type=str, default=guidance_emb_path)
@@ -608,15 +610,15 @@ if 'dse' in SUBTASK:
                         default=check_prepend_root_folder(load_model_class))
 
 
-# force_regen = True
-force_regen = False
+force_regen = True  # 从头训练需要重新生成数据
+# force_regen = False
 parser.add_argument('--force_regen', type=bool, default=force_regen)
 
 # if force_regen:
 load_encoders_label = None
 #encoder_path = '../save/harp/r13-ifdb-epbch-regression_ep-False_nowi_False-n_speedup-log2_np_False_whole-machsuite-poly_programl_False_False_None_None_nosplit_regular_encoder_True_s_penhance_codet5_64_tm_pk_v2_fc_co16_programl+src_code_feed_pclcc_pseudo_ntic_igt/encoders.klepto'
-#encoder_path = 'None'
-encoder_path = 'logs/train_2024-03-26T19-12-18.035699_regression_scai5/progsg_preprocessors.klepto'
+encoder_path = 'None'  # 从头训练，不加载已有编码器
+# encoder_path = 'logs/train_2024-03-26T19-12-18.035699_regression_scai5/progsg_preprocessors.klepto'
 
 
 if load_pretrained_GNN: # should be False
@@ -629,7 +631,7 @@ if encoder_path != 'None' and (not (encoder_path is None)):
     parser.add_argument('--load_encoders_label', type=str, default=load_encoders_label)
 
 #encoder_path = '../save/harp/r13-ifdb-epbch-regression_ep-False_nowi_False-n_speedup-log2_np_False_whole-machsuite-poly_programl_False_False_None_None_nosplit_regular_encoder_True_s_penhance_codet5_64_tm_pk_v2_fc_co16_programl+src_code_feed_pclcc_pseudo_ntic_igt/preprocessors.klepto'
-encoder_path = 'logs/train_2024-03-26T19-12-18.035699_regression_scai5/progsg_preprocessors.klepto'
+# encoder_path = 'logs/train_2024-03-26T19-12-18.035699_regression_scai5/progsg_preprocessors.klepto'  # 从头训练不使用
 parser.add_argument('--encoder_path', type=str, default=encoder_path)
 
 # outlier_removal = None
@@ -926,7 +928,8 @@ parser.add_argument('--device', default=device)
 if TASK == 'regression':
     # epoch_num = 1 # debugging
     # epoch_num = 800
-    epoch_num = 1000
+    # epoch_num = 1000  # 原始设置
+    epoch_num = 100  # 更新为用户要求的100个epoch
 else:
     epoch_num = 200
 if 'vpn' in get_host():

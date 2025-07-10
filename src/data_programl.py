@@ -26,7 +26,7 @@ def init_preprocessors_programl():
     ptypes_edge = Counter()
     ftypes_edge = Counter()
 
-    if FLAGS.encoder_path != None:
+    if FLAGS.encoder_path != 'None' and FLAGS.encoder_path is not None:
         encoders = load(FLAGS.encoder_path)
         if 'preprocessors_programl' in encoders.keys():
             encoders = encoders['preprocessors_programl']['encoders']
@@ -434,7 +434,7 @@ def _get_pragma_numeric(pragma_text, point, pragma_type):
 
 
 def fit_preprocessors_programl(preprocessors):
-    if FLAGS.encoder_path != None:
+    if FLAGS.encoder_path != 'None' and FLAGS.encoder_path is not None:
         saver.log_info(f'FLAGS.encoder_path != None so encoders are assumed to be already fitted -- skip fitting')
         preprocessors['itype_vocab'] = {}
         return

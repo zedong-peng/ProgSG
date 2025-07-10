@@ -12,6 +12,7 @@ from sklearn.metrics import mean_squared_error, mean_absolute_error, max_error, 
     mean_absolute_percentage_error, classification_report, confusion_matrix
 
 import torch
+import numpy as np
 from scipy.stats import rankdata, kendalltau
 from tqdm import tqdm
 from collections import OrderedDict, defaultdict
@@ -297,7 +298,27 @@ def _report_rmse_etc(points_dict, label, print_result=True):
             true_li = d['true']
             pred_li = d['pred']
             num_data = len(true_li)
-            mape = mean_absolute_percentage_error(true_li, pred_li)
+            
+            # 修复MAPE计算，对util目标使用稳定的计算方式
+            if 'util' in target_name:
+                # 对于util目标，使用epsilon避免除零问题
+                true_array = np.array(true_li)
+                pred_array = np.array(pred_li)
+                epsilon = 0.01  # 1%的利用率作为最小阈值
+                
+                # 计算稳定的MAPE
+                mape = np.mean(np.abs(pred_array - true_array) / (np.abs(true_array) + epsilon)) * 100
+                
+                # 可选：过滤掉真实值过小的样本
+                # mask = np.abs(true_array) > 0.01
+                # if mask.sum() > 0:
+                #     mape = mean_absolute_percentage_error(true_array[mask], pred_array[mask])
+                # else:
+                #     mape = 0.0  # 如果没有足够大的真实值，设为0
+            else:
+                # 对于其他目标使用标准MAPE
+                mape = mean_absolute_percentage_error(true_li, pred_li)
+            
             rmse = mean_squared_error(true_li, pred_li, squared=False)
             mse = mean_squared_error(true_li, pred_li, squared=True)
             mae = mean_absolute_error(true_li, pred_li)
